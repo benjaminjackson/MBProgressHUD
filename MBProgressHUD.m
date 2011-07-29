@@ -173,14 +173,19 @@
     }
     else if (mode == MBProgressHUDModeCustomView && self.customView != nil){
         self.indicator = self.customView;
-    } else {
+    }
+    else if (mode == MBProgressHUDModePlain) {
+        self.indicator = nil;
+    }
+    else {
 		self.indicator = [[[UIActivityIndicatorView alloc]
 						   initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge] autorelease];
         [(UIActivityIndicatorView *)indicator startAnimating];
 	}
 	
-	
-    [self addSubview:indicator];
+	if (indicator) {
+        [self addSubview:indicator];
+	}
 }
 
 #pragma mark -
@@ -305,14 +310,16 @@
     CGRect frame = self.bounds;
 	
     // Compute HUD dimensions based on indicator size (add margin to HUD border)
-    CGRect indFrame = indicator.bounds;
+    CGRect indFrame = nil == indicator ? CGRectZero : indicator.bounds;
     self.width = indFrame.size.width + 2 * margin;
     self.height = indFrame.size.height + 2 * margin;
 	
     // Position the indicator
     indFrame.origin.x = floorf((frame.size.width - indFrame.size.width) / 2) + self.xOffset;
     indFrame.origin.y = floorf((frame.size.height - indFrame.size.height) / 2) + self.yOffset;
-    indicator.frame = indFrame;
+	if (indicator) {
+        indicator.frame = indFrame;
+	}
 	
     // Add label if label text was set
     if (nil != self.labelText) {
@@ -346,7 +353,9 @@
 		
         // Move indicator to make room for the label
         indFrame.origin.y -= (floorf(lHeight / 2 + PADDING / 2));
-        indicator.frame = indFrame;
+		if (indicator) {
+            indicator.frame = indFrame;
+		}
 		
         // Set the label position and dimensions
         CGRect lFrame = CGRectMake(floorf((frame.size.width - lWidth) / 2) + xOffset,
@@ -387,7 +396,9 @@
 			
             // Move indicator to make room for the new label
             indFrame.origin.y -= (floorf(lHeight / 2 + PADDING / 2));
-            indicator.frame = indFrame;
+            if (indicator) {
+                indicator.frame = indFrame;
+            }
 			
             // Move first label to make room for the new label
             lFrame.origin.y -= (floorf(lHeight / 2 + PADDING / 2));
